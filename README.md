@@ -1,90 +1,99 @@
-# Spring-Boot-Security-Jwt
-Project using Spring Boot + Security + JWT for REST endpoints authentication / authorization.
+# SecureSpringJWT 🔐
 
+Проект аутентификации и авторизации REST API с использованием:
+- Spring Boot
+- Spring Security
+- JWT
 
-## About the example
+## 📌 Технологии и версии
 
-* Spring Boot 1.5.4.RELEASE
-* Sprign Framework 4.3.9.RELEASE
-* Spring Security 4.2.3.RELEASE
-* Tomcat Embed 8.5.15
-* Joda DateTime 2.9.9
+- Spring Boot `1.5.4.RELEASE`
+- Spring Framework `4.3.9.RELEASE`
+- Spring Security `4.2.3.RELEASE`
+- Tomcat Embed `8.5.15`
+- Joda DateTime `2.9.9`
 
-## Login
-You can login using two ways:
+## 🔐 Аутентификация
 
-1 - Calling the endpoint /login in LoginController<br/>
-    Format: JSON
-``` 
-{ 
-  "username" : "user"
-  "password" : "test123"
+Доступно два способа входа:
+
+### 1. Через JSON (/login)
+```json
+{
+  "username": "user",
+  "password": "test123"
 }
 ```
-2 - Calling the endpoint /loginForm that SpringSecurity offers and we config in WebSecurityConfig class.<br/> 
-    Format: x-www-form-urlencoded (Form submit, for example)
-    
-The success response is the following:
+### 2. Через форму (/loginForm)
+Формат: x-www-form-urlencoded
+
+Успешный ответ:
+
+```text
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiaHIiLCJyb2xlIjoiQURNSU4iLCJleHAiOjE1MDcxMDg3MjJ9.-fkoAQ-u8zHQBE4OgayRtJOpSTaEEyaL1bbPRt-bRNUy_qarcA8zs_BQ4aIh8n4FcQ3eZbK8HzOHZ5JzX08Yhg
 ```
-eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiaHIiLCJyb2xlIjoiQURNSU4iLCJleHAiOjE1MDcxMDg3MjJ9.-fkoAQ-u8zHQBE4OgayRtJOpSTaEEyaL1bbPRt-bRNUy_qarcA8zs_BQ4aIh8n4FcQ3eZbK8HzOHZ5JzX08Yhg  
-```  
-In case of any error during authentication:
-```
+Ошибка:
+
+```http
 401 Unauthorized
 ```
-    
-## Authenticated URL's 
-This URL's can only be reached if the user is authenticated (token is valid in the HEADER)
+### 🔒 Защищенные эндпоинты
+Требуют валидного JWT-токена в заголовке:
 
-Header:
+```http
+Authorization: Bearer ваш_токен
 ```
-  Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiaHIiLCJyb2xlIjoiQURNSU4iLCJleHAiOjE1MDcxMDg3MjJ9.-fkoAQ-u8zHQBE4OgayRtJOpSTaEEyaL1bbPRt-bRNUy_qarcA8zs_BQ4aIh8n4FcQ3eZbK8HzOHZ5JzX08Yhg
+Доступные эндпоинты:
+```
+GET /api/hello/admin - для администраторов
+
+GET /api/hello/user - для пользователей
+
+POST /api/me - информация о текущем пользователе
+
+POST /api/user - управление пользователями
 ```
 
-Endpoints Available:
+🚀 Запуск проекта
+Клонируйте репозиторий
 
-`http://localhost:8080/api/hello/admin` (GET) <br/>
-`http://localhost:8080/api/hello/user` (GET) <br/>
-`http://localhost:8080/api/me` (POST) <br/>
-`http://localhost:8080/api/user` (POST) <br/>
+Перейдите в папку проекта
 
+Выполните:
 
-## Running the Example
-This project contains an Embedded maven. 
-In a terminal, navigate to the project folder and run:
+Linux/macOS:
 
-On Linux:
-```
+```bash
 ./mvnw clean spring-boot:run
 ```
-On Windows
-```
+Windows:
+
+```cmd
 mvnw.cmd clean spring-boot:run
 ```
-
-
-Then, you can login:
-
-`http://localhost:8080/login`<br/>
-`http://localhost:8080/loginForm`
-
-Try any of the combinations:
-
-* User role: user/test123
-* Admin role: admin/test123
-
-They are configured in WebSecurityConfig.java:
-
+Откройте в браузере:
 
 ```
-    @Autowired
-    public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        //Default users to grant access
-        authenticationManagerBuilder
-            .inMemoryAuthentication()
-            .withUser("user").password("test123").authorities("USER").and()
-            .withUser("admin").password("test123").authorities("ADMIN");
+http://localhost:8080/login
+http://localhost:8080/loginForm
+```
 
-        authenticationManagerBuilder.authenticationProvider(authenticationProvider);
-    }
+## 👥 Тестовые пользователи
+
+| Роль         | Логин  | Пароль  |
+|--------------|--------|---------|
+| Пользователь | user   | test123 |
+| Администратор| admin  | test123 |
+
+
+Конфигурация пользователей в WebSecurityConfig.java:
+
+```java
+@Autowired
+public void configureAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+    auth.inMemoryAuthentication()
+        .withUser("user").password("test123").roles("USER")
+        .and()
+        .withUser("admin").password("test123").roles("ADMIN");
+}
 ```
